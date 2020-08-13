@@ -1,27 +1,249 @@
 package com.wcm.tools;
+
 import java.util.*;
 
 public class leetcode {
 
     public static void main(String[] args) {
-        System.out.println(countBinarySubstrings("1"));
-        System.out.println(countBinarySubstrings("0"));
-        System.out.println(countBinarySubstrings(""));
-        System.out.println(countBinarySubstrings("10"));
-        System.out.println(countBinarySubstrings("101"));
-        System.out.println(countBinarySubstrings("011"));
-        System.out.println(countBinarySubstrings("0110"));
-        System.out.println(countBinarySubstrings("01100"));
-        System.out.println(countBinarySubstrings("011001"));
-        System.out.println(countBinarySubstrings("0110011"));
+
     }
 
-    /* leetcode 696. 计数二进制子串
+    /*leetcode 43. 字符串相乘：给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
+                            num1 和 num2 的长度小于110。
+                            num1 和 num2 只包含数字 0-9。
+                            num1 和 num2 均不以零开头，除非是数字 0 本身。
+                            不能使用任何标准库的大数类型（比如 BigInteger）或直接将输入转换为整数来处理。
+                测试用例：
+                    System.out.println(multiply("2", "3"));//6
+                    System.out.println(multiply("3", "3"));//9
+                    System.out.println(multiply("2", "0"));//0
+                    System.out.println(multiply("0", "0"));//0
+                    System.out.println(multiply("22", "55"));//1210
+                    System.out.println(multiply("182", "111"));//20202
+                    System.out.println(multiply("20000000000", "0"));//0
+                    System.out.println(multiply("200000000000000000000", "2"));//400000000000000000000
+                    System.out.println(multiply("200000000000000000000", "10000000000000000000000"));//2000000000000000000000000000000000000000000
+                    System.out.println(multiply("200000000000000000001", "10000000000000000000000"));//2000000000000000000010000000000000000000000
+     */
+    static String multiply(String num1, String num2) {
+        String result = "";
+        if (isZero(num1) || isZero(num2)) {
+            return "0";
+        }
+        if (num1.length() > num2.length()) {
+            String tmp = num1;
+            num1 = num2;
+            num2 = tmp;
+        }
+        if (num1.length() == 1 && num2.length() == 1) {
+            return String.valueOf((num1.toCharArray()[0] - '0') * (num2.toCharArray()[0] - '0'));
+        }
+        int everyNumLength = num2.length() + 1;
+        int[][] tmpResult = new int[num1.length()][everyNumLength];
+        char[] numCs1 = num1.toCharArray();
+        char[] numCs2 = num2.toCharArray();
+        for (int i = numCs1.length - 1; i >= 0; i--) {
+            int up = 0;
+            for (int j = numCs2.length - 1; j >= 0; j--) {
+                int tmpR = (numCs1[i] - '0') * (numCs2[j] - '0');
+                tmpR += up;
+                up = tmpR / 10;
+                tmpR %= 10;
+                tmpResult[numCs1.length - 1 - i][j + 1] = tmpR;
+            }
+            tmpResult[numCs1.length - 1 - i][0] = up;
+        }
+        int up = 0;
 
+        for (int i = 0; i < tmpResult.length + everyNumLength - 1; i++) {
+            int tmpR = 0;
+            for (int j = 0; j <= i && j < tmpResult.length; j++) {
+                int thisIndex = everyNumLength - 1 - (i - j);
+                if (thisIndex < 0) {
+                    continue;
+                }
+                tmpR += tmpResult[j][thisIndex];
+            }
+            tmpR += up;
+            up = tmpR / 10;
+            tmpR %= 10;
+            result = tmpR + result;
+        }
+        while (result.startsWith("0") && result.length() > 1) {
+            result = result.substring(1);
+        }
+        return result;
+    }
+
+    static boolean isZero(String s) {
+        return s.length() == 1 && "0".equals(s);
+    }
+
+    /*leetcode 133. 克隆图 :给你无向 连通 图中一个节点的引用，请你返回该图的 深拷贝（克隆）。图中的每个节点都包含它的值 val（int） 和其邻居的列表（list[Node]）。
+            [[2,4],[1,3],[2,4],[1,3]]
+            测试用例1：
+                Node n = new Node(1);
+                Node newN = cloneGraph(n);
+                System.out.println(newN);
+            测试用例2：
+                Node n = new Node(1);
+                Node n2 = new Node(2,new ArrayList<Node>(){{add(n);}});
+                n.neighbors = new ArrayList<Node>(){{add(n2);}};
+                Node newN = cloneGraph(n);
+                System.out.println(newN);
+     */
+    static Map<Integer, Node> nodeMap = new HashMap<>();
+
+    static Node cloneGraph(Node node) {//1
+        if (node == null) {
+            return null;
+        }
+        return getNewNode(node);
+    }
+
+    //    static ArrayList<Node> getNeighbors(Node node) {
+//        ArrayList<Node> neighbors = new ArrayList<>();
+//        for(Node neighbor:node.neighbors) {
+//            if (nodeMap.containsKey(neighbor.val)) {
+////                continue;
+//                neighbors.add(nodeMap.get(neighbor.val));
+//            } else {
+//                neighbors.add(getNewNode(neighbor));//2,4
+//            }
+//        }
+//        return neighbors;
+//    }
+    static Node getNewNode(Node node) {//2
+        if (nodeMap.containsKey(node.val)) {
+            return nodeMap.get(node.val);
+        } else {
+            Node newNode = new Node(node.val, new ArrayList<>());//1 //2
+            nodeMap.put(node.val, newNode);
+            for (Node neighbor : node.neighbors) {
+                newNode.neighbors.add(getNewNode(neighbor));
+            }
+            return newNode;
+        }
+    }
+
+    /*leetcode 130. 被围绕的区域：给定一个二维的矩阵，包含 'X' 和 'O'（字母 O）。找到所有被 'X' 围绕的区域，并将这些区域里所有的 'O' 用 'X' 填充。
+        示例1：
+        输入：
+        [["X","X","X","X"],
+         ["X","O","O","X"],
+         ["X","X","O","X"],
+         ["X","O","X","X"]]
+        输出：
+        [["X","X","X","X"],
+         ["X","X","X","X"],
+         ["X","X","X","X"],
+         ["X","O","X","X"]]
+        测试用例：
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X'}, {'X', 'O', 'X'}, {'X', 'X', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X'}, {'X', 'O', 'X'}, {'X', 'O', 'X'}, {'X', 'X', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X'}, {'X', 'O', 'X'}, {'X', 'O', 'X'}, {'X', 'O', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X'}, {'X', 'O', 'X'}, {'X', 'X', 'X'}, {'X', 'O', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X'}, {'X', 'O', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X'}, {'O', 'X'}, {'X', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X'}, {'X', 'O', 'O'}, {'X', 'X', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X', 'X'}, {'X', 'O', 'O', 'O'}, {'X', 'X', 'X', 'X'}})));
+            System.out.println(JSONArray.toJSON(solve2(new char[][]{{'X', 'X', 'X', 'X'}, {'X', 'O', 'O', 'X'}, {'X', 'X', 'X', 'X'}})));
+     */
+    static char[][] solve2(char[][] board) {
+        solve(board);
+        return board;
+    }
+
+    static void solve(char[][] board) {
+        int height = board.length;
+        if (height < 3) {
+            return;
+        }
+        int width = board[0].length;
+        if (width < 3) {
+            return;
+        }
+
+        int[][] ways = getWays();
+        char[][] newBoard = new char[height][width];
+        for (char[] newB : newBoard) {
+            Arrays.fill(newB, 'X');
+        }
+        List<int[]> borders = findBorderAndSetNewBoard(board, newBoard);
+        for (int i = 0; i < borders.size(); i++) {
+            int[] border = borders.get(i);
+            for (int[] way : ways) {
+                int y = border[0] + way[0];
+                int x = border[1] + way[1];
+                if (x >= 0 && y >= 0 && x < width && y < height) {
+                    if (board[y][x] == 'O' && newBoard[y][x] != 'O') {
+                        newBoard[y][x] = 'O';
+                        borders.add(new int[]{y, x});
+                    }
+                }
+            }
+        }
+        System.arraycopy(newBoard, 0, board, 0, newBoard.length);
+    }
+
+    static int[][] getWays() {
+        int[][] ways = new int[4][1];
+        int[] up = new int[]{-1, 0};
+        int[] down = new int[]{1, 0};
+        int[] left = new int[]{0, -1};
+        int[] right = new int[]{0, 1};
+        ways[0] = up;
+        ways[1] = down;
+        ways[2] = left;
+        ways[3] = right;
+        return ways;
+    }
+
+    static List<int[]> findBorderAndSetNewBoard(char[][] board, char[][] newBoard) {
+        return findBorderAndSetNewBoard(board, 'O', newBoard);
+    }
+
+    static List<int[]> findBorderAndSetNewBoard(char[][] board, char target, char[][] newBoard) {
+        int width = board[0].length;
+        List<int[]> border = new ArrayList<>();
+        for (int i = 0; i < board.length; i++) {
+            if (i == 0 || i == board.length - 1) {
+                for (int j = 0; j < width; j++) {
+                    if (board[i][j] == target) {
+                        newBoard[i][j] = 'O';
+                        border.add(new int[]{i, j});
+                    }
+                }
+            } else {
+                if (board[i][0] == target) {
+                    newBoard[i][0] = 'O';
+                    border.add(new int[]{i, 0});
+                }
+                if (board[i][width - 1] == target) {
+                    newBoard[i][width - 1] = 'O';
+                    border.add(new int[]{i, width - 1});
+                }
+            }
+
+        }
+        return border;
+    }
+    /* leetcode 696. 计数二进制子串
+        测试用例：
+            System.out.println(countBinarySubstrings("1"));
+            System.out.println(countBinarySubstrings("0"));
+            System.out.println(countBinarySubstrings(""));
+            System.out.println(countBinarySubstrings("10"));
+            System.out.println(countBinarySubstrings("101"));
+            System.out.println(countBinarySubstrings("011"));
+            System.out.println(countBinarySubstrings("0110"));
+            System.out.println(countBinarySubstrings("01100"));
+            System.out.println(countBinarySubstrings("011001"));
+            System.out.println(countBinarySubstrings("0110011"));
      */
 
     static int countBinarySubstrings(String s) {
-        if(s.length()<2){
+        if (s.length() < 2) {
             return 0;
         }
         int result = 0;
@@ -29,19 +251,20 @@ public class leetcode {
         char current = chars[0];
         int lastCount = 0;
         int currentCount = 1;
-        for(int i = 1;i<chars.length;i++){
-            if(chars[i]!=current){
+        for (int i = 1; i < chars.length; i++) {
+            if (chars[i] != current) {
                 current = chars[i];
-                result+=Math.min(lastCount,currentCount);
+                result += Math.min(lastCount, currentCount);
                 lastCount = currentCount;
-                currentCount=1;
-            }else{
+                currentCount = 1;
+            } else {
                 currentCount++;
             }
         }
-        result+=Math.min(lastCount,currentCount);
+        result += Math.min(lastCount, currentCount);
         return result;
     }
+
     /* leetcode 93. 复原IP地址：给定一个只包含数字的字符串，复原它并返回所有可能的 IP 地址格式。
                     输入: "25525511135"；输出: ["255.255.11.135", "255.255.111.35"]
                     测试用例：
@@ -62,28 +285,29 @@ public class leetcode {
         if (s.length() < 4 || s.length() > 12) {
             return result;
         } else {
-            return split(s,3);
+            return split(s, 3);
         }
     }
-    static List<String> split(String s, int leftCount){
+
+    static List<String> split(String s, int leftCount) {
         List<String> result = new ArrayList<>();
-        if(leftCount==0){
-            if(!ipNumber(s)){
+        if (leftCount == 0) {
+            if (!ipNumber(s)) {
                 return result;
-            }else{
+            } else {
                 result.add(s);
                 return result;
             }
         }
-        for(int width = 1;width<=Math.min(3,s.length());width++){
-            String thisNum = s.substring(0,width);
+        for (int width = 1; width <= Math.min(3, s.length()); width++) {
+            String thisNum = s.substring(0, width);
             String left = s.substring(width);
-            if(!ipNumber(thisNum)||!rightLeft(left,leftCount)){
+            if (!ipNumber(thisNum) || !rightLeft(left, leftCount)) {
                 continue;
-            }else{
-                List<String>subs = split(left,leftCount-1);
-                for(String sub : subs){
-                    result.add(thisNum+"."+sub);
+            } else {
+                List<String> subs = split(left, leftCount - 1);
+                for (String sub : subs) {
+                    result.add(thisNum + "." + sub);
                 }
             }
         }
@@ -100,7 +324,7 @@ public class leetcode {
     }
 
     static boolean ipNumber(String s) {
-        if(s.startsWith("0")&&s.length()>1){
+        if (s.startsWith("0") && s.length() > 1) {
             return false;
         }
         int num = Integer.valueOf(s);

@@ -4,8 +4,179 @@ import java.util.*;
 
 public class leetcode {
 
+    //    static ArrayList<Integer> getArrayList(String json){
+//        return JSONArray.toJSON();
+//    }
     public static void main(String[] args) {
+        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>() {{
+            add(3);
+            add(9);
+            add(20);
+            add(null);
+            add(null);
+            add(15);
+            add(7);
+        }})));
+        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>() {{
+            add(1);
+            add(2);
+            add(2);
+            add(3);
+            add(3);
+            add(null);
+            add(null);
+            add(4);
+            add(4);
+        }})));
+        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>(){{add(1);}})));
 
+        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>(){{add(3);add(3);add(9);add(20);add(null);add(null);add(15);add(7);}})));
+    }
+
+    /*leetcode 110. 平衡二叉树：给定一个二叉树，判断它是否是高度平衡的二叉树。
+
+     */
+
+    static boolean isBalanced(TreeNode root) {
+        if(root == null){
+            return true;
+        }
+        try {
+            return getHeight(root,0)>=0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    static int getHeight(TreeNode root,int i) throws Exception{
+        if(root ==null){
+            return i;
+        }
+        int leftHeight = getHeight(root.left,i+1);
+        int rightHeight = getHeight(root.right,i+1);
+        if(Math.abs(leftHeight-rightHeight)>1){
+            throw new Exception();
+        }
+        return Math.max(leftHeight,rightHeight);
+    }
+
+//    static boolean validLeafLength(TreeNode root, int length) {
+//        if (root == null) {
+//            return true;
+//        }
+//        if (root.left == null && root.right == null) {
+//            if (max == -1) {
+//                max = length;
+//                min = length;
+//            } else if (length > max) {
+//                max = length;
+//            } else if (length < min) {
+//                min = length;
+//            }
+//            return max - min <= 1;
+//        } else {
+//            return (validLeafLength(root.left, length + 1) && validLeafLength(root.right, length + 1));
+//        }
+//    }
+
+
+    /*leetcode 733. 图像渲染：有一幅以二维整数数组表示的图画，每一个整数表示该图画的像素值大小，数值在 0 到 65535 之间。
+                    给你一个坐标 (sr, sc) 表示图像渲染开始的像素值（行 ，列）和一个新的颜色值 newColor，让你重新上色这幅图像。
+                    为了完成上色工作，从初始坐标开始，记录初始坐标的上下左右四个方向上像素值与初始坐标相同的相连像素点，接着再记录这四个方向上符合条件的像素点与他们对应四个方向上像素值与初始坐标相同的相连像素点，……，重复该过程。将所有有记录的像素点的颜色值改为新的颜色值。
+                    最后返回经过上色渲染后的图像。
+                    示例：{1, 2, 3},
+                         {2, 2, 3},
+                         {1, 2, 3}
+                    测试用例：
+                        System.out.println(Arrays.deepToString(floodFill(new int[][]{{1, 2, 3}, {2, 2, 3}, {1, 2, 3}}, 1, 1, 3)));
+                        System.out.println(Arrays.deepToString(floodFill(new int[][]{{2, 2, 3}, {1, 2, 3}, {1, 2, 3}}, 1, 1, 3)));
+                        System.out.println(Arrays.deepToString(floodFill(new int[][]{{2, 1, 3}, {2, 2, 3}, {1, 2, 3}}, 1, 1, 3)));
+                        System.out.println(Arrays.deepToString(floodFill(new int[][]{{2, 1, 3}, {1, 2, 3}, {1, 2, 2}}, 1, 1, 3)));
+                        System.out.println(Arrays.deepToString(floodFill(new int[][]{{0, 0, 0}, {0, 0, 0}}, 0, 0, 2)));
+                        System.out.println(Arrays.deepToString(floodFill(new int[][]{{0, 0, 0}, {0, 1, 1}}, 1, 1, 1)));
+     */
+    static int[] xs = new int[]{1, -1, 0, 0};
+    static int[] ys = new int[]{0, 0, 1, -1};
+
+    static int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
+        int oldColor = image[sr][sc];
+        if (newColor == oldColor) {
+            return image;
+        }
+        image = floodFill(image, sr, sc, newColor, oldColor);
+        return image;
+    }
+
+    static int[][] floodFill(int[][] image, int sr, int sc, int newColor, int oldColor) {
+        if (!(sr < 0 || sc < 0 || sc > image[0].length - 1 || sr > image.length - 1) && image[sr][sc] == oldColor) {
+            image[sr][sc] = newColor;
+            for (int i = 0; i < 4; i++) {
+                image = floodFill(image, sr + xs[i], sc + ys[i], newColor, oldColor);
+            }
+        }
+        return image;
+    }
+
+    /*leetcode 546. 移除盒子：消消乐：给出一些不同颜色的盒子，盒子的颜色由数字表示，即不同的数字表示不同的颜色。
+                            你将经过若干轮操作去去掉盒子，直到所有的盒子都去掉为止。每一轮你可以移除具有相同颜色的连续 k 个盒子（k >= 1），
+                            这样一轮之后你将得到 k*k 个积分。 当你将所有盒子都去掉之后，求你能获得的最大积分和。
+                    测试用例：
+                        System.out.println(removeBoxes(new int[]{1}));
+                        System.out.println(removeBoxes(new int[]{1, 2}));
+                        System.out.println(removeBoxes(new int[]{1, 1}));
+                        System.out.println(removeBoxes(new int[]{1, 2, 1}));
+                        System.out.println(removeBoxes(new int[]{1, 1, 1}));
+
+                        System.out.println(removeBoxes(new int[]{ 1,2,2,2,1,2,1}));//todo 失败用例！
+                        System.out.println(removeBoxes(new int[]{ 1,3,2,3,1}));
+                        System.out.println(removeBoxes(new int[]{ 1,3, 2, 2, 3, 4, 3,1}));
+                        System.out.println(removeBoxes(new int[]{1, 3, 2, 2, 2, 3, 4, 3, 1}));
+
+                        System.out.println(removeBoxes(new int[]{1, 2, 3, 4, 3, 3, 3}));
+                        System.out.println(removeBoxes(new int[]{1, 2, 4, 3, 4, 4, 4, 3, 3, 3}));
+                        System.out.println(removeBoxes(new int[]{1, 2, 4, 4, 3, 4, 4, 4, 3, 3, 3}));
+
+               //todo 失败！！
+     */
+    static int removeBoxes(int[] boxes) {
+        return removeBoxesDP(boxes, 0, boxes.length - 1, 0);
+    }
+
+    static int removeBoxesDP(int[] boxes, int start, int end, int k) {
+        if (start == end) {
+            return (1 + k) * (1 + k);
+        } else if (end < start) {
+            return 0;
+        }
+        int endV = boxes[end];
+        while (end >= 0 && endV == boxes[end]) {
+            end--;
+            k++;
+        }
+        int i = findSameV(boxes, start, end, endV);
+        if (i == -1) {
+            int tmp = removeBoxesDP(boxes, start, end, 0);
+            return tmp + k * k;
+        } else {
+            int tmp = removeBoxesDP(boxes, start, end, 0);
+            int a = tmp + k * k;
+            int tmp2 = removeBoxesDP(boxes, i + 1, end, 0);
+            int tmp3 = removeBoxesDP(boxes, start, i, k);
+            int b = tmp2 + tmp3;
+            System.out.println("s:" + start + ",e:" + (end + 1));
+            System.out.println(a + "|" + b);
+            return Math.max(a, b);
+        }
+    }
+
+    static int findSameV(int[] boxes, int start, int end, int endV) {
+        while (end > start) {
+            end--;
+            if (boxes[end] == endV) {
+                return end;
+            }
+        }
+        return -1;
     }
 
     /*leetcode 43. 字符串相乘：给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
@@ -1178,24 +1349,24 @@ public class leetcode {
         }
     }
 
-    static class TreeNode {
-        int val;
-        TreeNode left;
-        TreeNode right;
-
-        TreeNode() {
-        }
-
-        TreeNode(int val) {
-            this.val = val;
-        }
-
-        TreeNode(int val, TreeNode left, TreeNode right) {
-            this.val = val;
-            this.left = left;
-            this.right = right;
-        }
-    }
+//    static class TreeNode {
+//        int val;
+//        TreeNode left;
+//        TreeNode right;
+//
+//        TreeNode() {
+//        }
+//
+//        TreeNode(int val) {
+//            this.val = val;
+//        }
+//
+//        TreeNode(int val, TreeNode left, TreeNode right) {
+//            this.val = val;
+//            this.left = left;
+//            this.right = right;
+//        }
+//    }
     /*leetcode 632. 最小区间：你有 k 个升序排列的整数数组。找到一个最小区间，使得 k 个列表中的每个列表至少有一个数包含在其中。
         注意:
             给定的列表可能包含重复元素，所以在这里升序表示 >= 。

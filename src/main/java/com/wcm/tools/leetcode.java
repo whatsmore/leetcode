@@ -4,60 +4,92 @@ import java.util.*;
 
 public class leetcode {
 
-    //    static ArrayList<Integer> getArrayList(String json){
-//        return JSONArray.toJSON();
-//    }
     public static void main(String[] args) {
-        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>() {{
-            add(3);
-            add(9);
-            add(20);
-            add(null);
-            add(null);
-            add(15);
-            add(7);
-        }})));
-        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>() {{
-            add(1);
-            add(2);
-            add(2);
-            add(3);
-            add(3);
-            add(null);
-            add(null);
-            add(4);
-            add(4);
-        }})));
-        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>(){{add(1);}})));
-
-        System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>(){{add(3);add(3);add(9);add(20);add(null);add(null);add(15);add(7);}})));
+//        ListNode l11= new ListNode(11);
+//        ListNode l10 = new ListNode(10,l11);
+//        ListNode l9 = new ListNode(9,l10);
+//        ListNode l8 = new ListNode(8,l9);
+//        ListNode l7 = new ListNode(7,l8);
+//        ListNode l6 = new ListNode(6,l7);
+//        ListNode l5 = new ListNode(5,l6);
+//        ListNode l4 = new ListNode(4,l5);
+//        ListNode l3 = new ListNode(3,l4);
+//        ListNode l2 = new ListNode(2,l3);
+//        ListNode l1 = new ListNode(1,l2);
+//        ListNode l4 = new ListNode(-10);
+//        ListNode l3 = new ListNode(-3,l4);
+//        ListNode l2 = new ListNode(0,l3);
+//        ListNode l1 = new ListNode(5,l2);
+//        ListNode l0 = new ListNode(9,l1);
+//        TreeNode  a = sortedListToBST(l0);
+        TreeNode  a = sortedListToBST(null);
+        System.out.println(a);
     }
 
+    /*leetcode 109. 有序链表转换二叉搜索树：给定一个单链表，其中的元素按升序排序，将其转换为高度平衡的二叉搜索树。
+                测试用例：
+     */
+    static TreeNode sortedListToBST(ListNode head) {
+        if(head==null){
+            return null;
+        }
+        List<Integer> arr = getArrByListNode(head);
+        return getRoot(arr, 0, arr.size() - 1);
+    }
+
+    static TreeNode getRoot(List<Integer> arr, int start, int end) {
+        TreeNode root = new TreeNode();
+        if (end < start) {
+            return null;
+        }
+        int thisIndex = (end+1 - start) / 2 + start;
+        root.val = arr.get(thisIndex);
+//        if(end>start){
+        root.left = getRoot(arr, start, thisIndex - 1);
+        root.right = getRoot(arr, thisIndex + 1, end);
+//        }
+        return root;
+    }
+
+    static List<Integer> getArrByListNode(ListNode head) {
+        List<Integer> result = new ArrayList<>();
+        result.add(head.val);
+        while (head.next != null) {
+            head = head.next;
+            result.add(head.val);
+        }
+        return result;
+    }
     /*leetcode 110. 平衡二叉树：给定一个二叉树，判断它是否是高度平衡的二叉树。
+            测试用例：
+                System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>() {{ add(3);add(9);add(20);add(null);add(null);add(15);add(7); }})));
+                System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>() {{ add(1);add(2);add(2);add(3);add(3);add(null);add(null);add(4);add(4); }})));
+                System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>(){{add(1);}})));
+                System.out.println(isBalanced(TreeNode.getTree(new ArrayList<Integer>(){{add(3);add(3);add(9);add(20);add(null);add(null);add(15);add(7);}})));
 
      */
 
     static boolean isBalanced(TreeNode root) {
-        if(root == null){
+        if (root == null) {
             return true;
         }
         try {
-            return getHeight(root,0)>=0;
+            return getHeight(root, 0) >= 0;
         } catch (Exception e) {
             return false;
         }
     }
 
-    static int getHeight(TreeNode root,int i) throws Exception{
-        if(root ==null){
+    static int getHeight(TreeNode root, int i) throws Exception {
+        if (root == null) {
             return i;
         }
-        int leftHeight = getHeight(root.left,i+1);
-        int rightHeight = getHeight(root.right,i+1);
-        if(Math.abs(leftHeight-rightHeight)>1){
+        int leftHeight = getHeight(root.left, i + 1);
+        int rightHeight = getHeight(root.right, i + 1);
+        if (Math.abs(leftHeight - rightHeight) > 1) {
             throw new Exception();
         }
-        return Math.max(leftHeight,rightHeight);
+        return Math.max(leftHeight, rightHeight);
     }
 
 //    static boolean validLeafLength(TreeNode root, int length) {

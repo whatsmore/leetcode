@@ -1,9 +1,6 @@
 package com.wcm.tools;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 public class TreeNode {
     public int val;
@@ -22,8 +19,14 @@ public class TreeNode {
         this.left = left;
         this.right = right;
     }
-    static TreeNode getTree(ArrayList<Integer> arr){
-        if(arr.isEmpty()){
+    static TreeNode getTree(Integer[] arr){
+        if(arr==null||arr.length==0){
+            return null;
+        }
+        return getTree(new ArrayList<>(Arrays.asList(arr)));
+    }
+    static TreeNode getTree(List<Integer> arr){
+        if(arr==null||arr.isEmpty()){
             return null;
         }
         TreeNode root = new TreeNode(arr.get(0));

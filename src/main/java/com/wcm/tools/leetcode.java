@@ -5,12 +5,414 @@ import java.util.*;
 public class leetcode {
 
     public static void main(String[] args) {
+        System.out.println("1 ".trim());
+        System.out.println("1 1".trim());
 
+
+//        System.out.println(isNumber("+1e0E0"));
+//        System.out.println(isNumber("-."));
+//        System.out.println(isNumber("5e2"));
+//        System.out.println(isNumber("-123"));
+//        System.out.println(isNumber("3.1416"));
+//        System.out.println(isNumber("-1E-16"));
+//        System.out.println(isNumber("0123"));
+//        System.out.println(isNumber("12e"));
+//        System.out.println(isNumber("1a3.14"));
+//        System.out.println(isNumber("1.2.3"));
+//        System.out.println(isNumber("+-5"));
+//        System.out.println(isNumber("12e+5.4"));
     }
 
-    /* leetcode 17. 电话号码的字母组合
+    /* 剑指 Offer 20. 表示数值的字符串
+            测试用例：
+                System.out.println(isNumber("+100"));//true
+                System.out.println(isNumber("5e2"));//true
+                System.out.println(isNumber("-123"));//true
+                System.out.println(isNumber("3.1416"));//true
+                System.out.println(isNumber("-1E-16"));//true
+                System.out.println(isNumber("0123"));//true
+                System.out.println(isNumber("12e"));//false
+                System.out.println(isNumber("1a3.14"));//false
+                System.out.println(isNumber("1.2.3"));//false
+                System.out.println(isNumber("+-5"));//false
+                System.out.println(isNumber("12e+5.4"));//false
+     */
+    static boolean isNumber(String s) {
+        s=s.trim();
+        return isNumber(s, true);
+    }
+
+    static boolean isNumber(String s, boolean canHaveDot) {
+        s = s.trim();
+        if (s.isEmpty() || "+".equals(s) || "-".equals(s)||".".equals(s)) {
+            return false;
+        }
+        int es = findE(s);
+        if (s.startsWith("e") || s.startsWith("E") || s.endsWith("e") || s.endsWith("E") || es > 1) {
+            return false;
+        } else if (es == 1) {
+            int eIndex = s.indexOf("e") > 0 ? s.indexOf("e") : s.indexOf("E");
+            return isNumber(s.substring(0, eIndex),true) && isNumber(s.substring(eIndex + 1), false);
+        } else {
+            int i = 0;
+            int dot = 0;
+            int nums = 0;
+            if (s.startsWith("-") || s.startsWith("+")) {
+                i++;
+            }
+            while (i < s.length()) {
+                if (s.charAt(i) == '.') {
+                    if (!canHaveDot||dot > 0) {
+                        return false;
+                    } else {
+                        dot++;
+                        i++;
+                        continue;
+                    }
+                }
+                if (s.charAt(i) < '0' || s.charAt(i) > '9') {
+                    return false;
+                }
+                nums++;
+                i++;
+            }
+            return nums>0;
+        }
+    }
+
+    static int[] firstTwoE(String s) {
+        return new int[2];
+    }
+
+    static int findE(String s) {
+        int result = -2;
+        int eIndex = 0;
+        int EIndex = 0;
+        if (s.startsWith("e") || s.startsWith("E")) {
+            result++;
+        }
+        while (eIndex != -1 || EIndex != -1) {
+            if (eIndex != -1) {
+                result++;
+                eIndex = s.indexOf("e", eIndex + 1);
+            }
+            if (EIndex != -1) {
+                result++;
+                EIndex = s.indexOf("E", EIndex + 1);
+            }
+        }
+        return result;
+    }
+
+    /* leetcode 486. 预测赢家 给定一个表示分数的非负整数数组。 玩家 1 从数组任意一端拿取一个分数，随后玩家 2 继续从剩余数组任意一端拿取分数，然后玩家 1 拿，…… 。
+                        每次一个玩家只能拿取一个分数，分数被拿取之后不再可取。直到没有剩余分数可取时游戏结束。最终获得分数总和最多的玩家获胜。
+                        测试用例：
+                            输入：[1, 5, 2]
+                            输出：false //先手得分低
+                            System.out.println(predictTheWinner(new int[]{1}));
+                            System.out.println(predictTheWinner(new int[]{1, 2}));
+                            System.out.println(predictTheWinner(new int[]{1, 5, 2}));
+                            System.out.println(predictTheWinner(new int[]{1, 2, 3, 5, 4, 3, 3, 4, 5, 6, 4, 5}));
+     */
+
+//    static int[][] dp = new int[21][21];
+//    static boolean predictTheWinner(int[] nums) {
+//        if (nums.length <= 2) {
+//            return true;
+//        }
+//        return dpPredictTheWinner(nums, 0, nums.length - 1) >= 0;
+//    }
+//
+//    static int dpPredictTheWinner(int[] nums, int i, int j) {
+//        if(dp[i][j]>0){
+//            return dp[i][j];
+//        }
+//        if (i > j) {
+//            return 0;
+//        } else if (i == j) {
+//            return nums[i];
+//        } else {
+//            int result =  Math.max(nums[i] - dpPredictTheWinner(nums, i + 1, j), nums[j] - dpPredictTheWinner(nums, i, j - 1));
+//            dp[i][j]=result;
+//            return result;
+//        }
+//    }
+
+    /*leetcode 841. 钥匙和房间：有 N 个房间，开始时你位于 0 号房间。每个房间有不同的号码：0，1，2，...，N-1，并且房间里可能有一些钥匙能使你进入下一个房间。
+                    测试用例：
+                        System.out.println(canVisitAllRooms(MyList.changeArrayToList(new int[][]{{},{0}})));
+                        System.out.println(canVisitAllRooms(MyList.changeArrayToList(new int[][]{{1,2},{0},{1}})));
+                        System.out.println(canVisitAllRooms(MyList.changeArrayToList(new int[][]{{1},{0},{2}})));
+                        System.out.println(canVisitAllRooms(MyList.changeArrayToList(new int[][]{{0},{0},{2}})));
+     */
+//    static boolean canVisitAllRooms(List<List<Integer>> rooms) {
+//        Stack<Integer> keys = new Stack<>();
+//        Set<Integer> canGo= new HashSet<Integer>(){{add(0);}};
+//        for (int key : rooms.get(0)) {
+//            if (!canGo.contains(key)) {
+//                keys.push(key);
+//                canGo.add(key);
+//            }
+//        }
+//        while(keys.size()>0) {
+//            int i = keys.pop();
+//            for (int key : rooms.get(i)) {
+//                if (!canGo.contains(key)) {
+//                    keys.push(key);
+//                    canGo.add(key);
+//                }
+//            }
+//        }
+//
+//        return canGo.size()==rooms.size();
+//    }
+
+    /*天池大赛 找到前后缀得分，abcxyzcba = 3+2+1+字符串长度
+            测试用例：
+                System.out.println(suffixQuery("abcxyzcba"));
+                System.out.println(suffixQuery("aa"));
+                System.out.println(suffixQuery("abccba"));
+                System.out.println(suffixQuery("abcba"));
 
      */
+//    static long suffixQuery(String s) {
+//        // write your code here
+//        long result = 0;
+////        long result = s.length();
+//        for (int i = 0; i < s.length(); i++) {
+//            int j = i + 1;
+//            while (s.indexOf(s.charAt(i), j) > 0) {
+//                long thisResult = 0l;
+//                j = s.indexOf(s.charAt(i), j);
+//                int middle = (j - i) % 2 == 0 ? (j - i) / 2 : (j - i) / 2 + 1;
+//                for (int k = 1; k <= middle; k++) {
+//                    if (s.charAt(i + k) == s.charAt(j - k)) {
+//                        thisResult++;
+//                    }
+//                }
+//                result += thisResult;
+//                j++;
+//            }
+//        }
+//        return result;
+}
+    /*天池大赛 ：有一组木棍，问最少砍几次可以使得木棍组成正三角形
+        测试用例：
+            System.out.println(treePlanning(new int[]{1, 2, 3, 5, 6}, 2));
+            System.out.println(makeEquilateralTriangle(new int[]{2,3,7,5}));
+     */
+//    static int makeEquilateralTriangle(int[] lengths) {
+//        Arrays.sort(lengths);
+//        for(int i = 1;i<lengths.length-1;i++){
+//            if(lengths[i-1]==lengths[i]&&lengths[i]==lengths[i+1]){
+//                return 0;
+//            }
+//        }
+//        for(int i = lengths.length-1;i>0;i--){
+//            int thisLength = lengths[i];
+//            if(thisLength%2==0){
+//                for(int j=0;j<i;j++){
+//                    if(2*lengths[j]>lengths[i]){
+//                        break;
+//                    }else if(2*lengths[j]==lengths[i]){
+//                        return 1;
+//                    }
+//                }
+//            }
+//        }
+//        for(int i = 0;i<lengths.length-1;i++){
+//            if(lengths[i]==lengths[i+1]){
+//                return 1;
+//            }
+//        }
+//        return 2;
+//    }
+
+
+//    static List<Integer> killIndex = new ArrayList<>();
+//
+//    static int treePlanning(int[] trees, int d) {
+//        int result = Integer.MAX_VALUE;
+//        for (int i = 1; i < trees.length; i++) {
+//            killIndex = new ArrayList<>();
+//            result = Math.min(result, Math.min(kill(trees, i, d), notKill(trees, i, d)));
+//        }
+//        return result;
+//    }
+//
+//    static int kill(int[] trees, int index, int d) {
+//        int result = 1;
+//        killIndex.add(index);
+//        if (index >= 0 && index < trees.length) {
+//            int nextTreeIndex = findNextTree(index + 1, trees.length - 1);
+//            int lastTreeIndex = findLastTree(index - 1);
+//            if (nextTreeIndex >= 0 && lastTreeIndex < 0) {
+//                result += Math.min(notKill(trees, nextTreeIndex, d),kill(trees, nextTreeIndex, d) );
+//            } else if (nextTreeIndex < 0 && lastTreeIndex >= 0) {
+//                result += Math.min(notKill(trees, lastTreeIndex, d),kill(trees, lastTreeIndex, d) );
+//            } else if (nextTreeIndex >= 0 && lastTreeIndex >= 0) {
+//                if (trees[nextTreeIndex] - trees[lastTreeIndex] < d) {
+//                    result += Math.min(kill(trees, nextTreeIndex, d), kill(trees, lastTreeIndex, d));
+//                } else {
+//                    result += Math.min(notKill(trees, nextTreeIndex, d), notKill(trees, lastTreeIndex, d));
+//                }
+//            }
+//        }
+//        return result;
+//    }
+//
+//    static int notKill(int[] trees, int index, int d) {
+//        int result = 0;
+//        if (index >= 0 && index < trees.length) {
+//            int thisNum = trees[index];
+//            int nextTreeIndex = findNextTree(index + 1, trees.length - 1);
+//            if (nextTreeIndex >= 0) {
+//                if (trees[nextTreeIndex] - thisNum < d) {
+//                    result += kill(trees, nextTreeIndex, d);
+//                } else {
+//                    result += notKill(trees, nextTreeIndex, d);
+//                }
+//            }
+//
+//            int lastTreeIndex = findLastTree(index - 1);
+//            if (lastTreeIndex >= 0) {
+//                if (thisNum - trees[lastTreeIndex] < d) {
+//                    result += kill(trees, lastTreeIndex, d);
+//                } else {
+//                    result += notKill(trees, lastTreeIndex, d);
+//                }
+//            }
+//        }
+//        return result;
+//    }
+//
+//    static int findLastTree(int index) {
+//        while (killIndex.contains(index) || index >= 0) {
+//            index--;
+//        }
+//        return index;
+//    }
+//
+//    static int findNextTree(int index, int maxIndex) {
+//        while (killIndex.contains(index)) {
+//            index++;
+//            if (index > maxIndex) {
+//                return -1;
+//            }
+//        }
+//        return index;
+//    }
+
+    /* leetcode 753. 破解保险箱：有一个需要密码才能打开的保险箱。密码是 n 位数, 密码的每一位是 k 位序列 0, 1, ..., k-1 中的一个 。
+                                你可以随意输入密码，保险箱会自动记住最后 n 位输入，如果匹配，则能够打开保险箱。
+                                举个例子，假设密码是 "345"，你可以输入 "012345" 来打开它，只是你输入了 6 个字符。请返回一个能打开保险箱的最短字符串。
+                                System.out.println(crackSafe(1,2));
+        System.out.println(crackSafe(2,2));
+        System.out.println(crackSafe(2,5));
+
+     */
+//    static String crackSafe(int n, int k) {//n 代表窗口，k 代表几进制
+//        String result = addZero("", n);
+//        String maxNum = addNum("1", n, 0);
+//        String num = "0";
+//        num = getNum(num, k);
+//        while (Integer.valueOf(num) < Integer.valueOf(maxNum)) {
+//            if (result.contains(num)) {
+//                num = getNum(num, k);
+//                continue;
+//            }
+//            result += num;
+//            result = addZero(result, n - num.length());
+//        }
+//        return result;
+//    }
+//
+//    static String getNum(String num, int k) {
+//        if (k == 10) {
+//            return String.valueOf(Integer.valueOf(num) + 1);
+//        } else {
+//            char[] numChars = num.toCharArray();
+//            numChars[numChars.length - 1] += 1;
+//            for (int i = numChars.length - 1; i > 0; i--) {
+//                if (numChars[i] - '0' >= k) {
+//                    numChars[i] = '1';
+//                    numChars[i - 1] += 1;
+//                } else {
+//                    break;
+//                }
+//
+//            }
+//            if (numChars[0] - '0' >= k) {
+//                numChars[0] = '1';
+//                return "1" + String.valueOf(numChars);
+//            }
+//            return String.valueOf(numChars);
+//        }
+//    }
+//
+//    static String addZero(String s, int n) {
+//        return addNum(s, n, 0);
+//    }
+//
+//    static String addNum(String s, int n, int num) {
+//        StringBuilder sb = new StringBuilder(s);
+//        for (int i = 0; i < n; i++) {
+//            sb.append((char) (num + '0'));
+//        }
+//        return sb.toString();
+//    }
+
+    /* letcode 332. 重新安排行程：给定一个机票的字符串二维数组 [from, to]，子数组中的两个成员分别表示飞机出发和降落的机场地点，对该行程进行重新规划排序。所有这些机票都属于一个从 JFK（肯尼迪国际机场）出发的先生，所以该行程必须从 JFK 开始。
+                        说明：
+                            如果存在多种有效的行程，你可以按字符自然排序返回最小的行程组合。例如，行程 ["JFK", "LGA"] 与 ["JFK", "LGB"] 相比就更小，排序更靠前
+                            所有的机场都用三个大写字母表示（机场代码）。
+                            假定所有机票至少存在一种合理的行程。
+     */
+//    static List<String> findItinerary(List<List<String>> tickets) {
+//        return null;
+//    }
+
+    /* leetcode 17. 电话号码的字母组合：给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合（九宫格输入法）
+                    测试用例：
+                        System.out.println(letterCombinations(""));
+                        System.out.println(letterCombinations("23"));
+     */
+//    static Map<Integer, char[]> mapper = new HashMap<Integer, char[]>() {{
+//        put(2, new char[]{'a', 'b', 'c'});
+//        put(3, new char[]{'d', 'e', 'f'});
+//        put(4, new char[]{'g', 'h', 'i'});
+//        put(5, new char[]{'j', 'k', 'l'});
+//        put(6, new char[]{'m', 'n', 'o'});
+//        put(7, new char[]{'p', 'q', 'r', 's'});
+//        put(8, new char[]{'a', 'b', 'c'});
+//        put(9, new char[]{'w', 'x', 'y', 'z'});
+//    }};
+//    static List<String> result = new ArrayList<>();
+//
+//    static List<String> letterCombinations(String digits) {
+//        result = new ArrayList<>();
+//        if(digits.isEmpty()){
+//            return result;
+//        }
+//        dfs(digits.toCharArray(),"",0);
+//        return result;
+//    }
+//
+//    static void dfs(char[] digits, String levelResult, int cur) {
+//        int num = digits[cur]-'0';
+//        if(num<2||num>9){
+//            return;
+//        }
+//        char[] words = mapper.get(num);
+//        for(char word:words){
+//            String thisResult = levelResult+word;
+//            if (cur == digits.length - 1) {
+//                result.add(thisResult);
+//            }else{
+//                dfs(digits,thisResult,cur+1);
+//            }
+//        }
+//    }
 
     /*leetcode 491. 递增子序列：给定一个整型数组, 找到所有该数组的递增子序列，递增子序列的长度至少是2。
                     说明：给定数组的长度不会超过15。数组中的整数范围是 [-100,100]。给定数组中可能包含重复数字，相等的数字应该被视为递增的一种情况。
@@ -516,7 +918,7 @@ public class leetcode {
 //        return getNewNode(node);
 //    }
 
-    //    static ArrayList<Node> getNeighbors(Node node) {
+//    static ArrayList<Node> getNeighbors(Node node) {
 //        ArrayList<Node> neighbors = new ArrayList<>();
 //        for(Node neighbor:node.neighbors) {
 //            if (nodeMap.containsKey(neighbor.val)) {
@@ -1091,10 +1493,154 @@ public class leetcode {
 
      */
 
-    /**
-     * @param root 树的根节点
-     * @return 锯齿形层次遍历数组
-     */
+/**
+ * @param root 树的根节点
+ * @return 锯齿形层次遍历数组
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ * @param nums
+ * @return 判断是否是有效的括号
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ * <p>
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ */
 
 //    static List<List<Integer>> result = new ArrayList<>();
 //
@@ -1186,10 +1732,10 @@ public class leetcode {
 
      */
 
-    /**
-     * @param root 树的根节点
-     * @return 最大非间隔权重
-     */
+/**
+ * @param root 树的根节点
+ * @return 最大非间隔权重
+ */
 //    static int rob(TreeNode root) {
 //        return Math.max(getMaxSelect(root, true), getMaxSelect(root, false));
 //    }
@@ -1330,11 +1876,11 @@ public class leetcode {
 //        return true;
 //    }
 
-    /**
-     * @param numCourses    课程数
-     * @param prerequisites 课程依赖组
-     * @return 能否完成（存在环形依赖则不可完成）
-     */
+/**
+ * @param numCourses    课程数
+ * @param prerequisites 课程依赖组
+ * @return 能否完成（存在环形依赖则不可完成）
+ */
 //    static boolean canFinish(int numCourses, int[][] prerequisites) {
 //        Set<Integer>[] lists = new HashSet[numCourses];
 //        for (int i = 0; i < prerequisites.length; i++) {
@@ -1404,10 +1950,10 @@ public class leetcode {
             System.out.println(simplifyPath("/a/b/.a./../../..//c/"));//throw IllegalArgumentException
      */
 
-    /**
-     * @param path 需要简化的路径
-     * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
-     */
+/**
+ * @param path 需要简化的路径
+ * @return 返回被简化的绝对路径，最后一个目录不以斜杆（/）结束
+ */
 //    static String simplifyPath(String path) {
 //        String result;
 //        if (!path.endsWith("/")) {
@@ -1492,11 +2038,11 @@ public class leetcode {
             System.out.println(addStrings("", ""));//throw IllegalArgumentException;
      */
 
-    /**
-     * @param num1 第一个数字的字符串
-     * @param num2 第二个数字的字符串
-     * @return 返回和的字符串
-     */
+/**
+ * @param num1 第一个数字的字符串
+ * @param num2 第二个数字的字符串
+ * @return 返回和的字符串
+ */
 //    static String addStrings(String num1, String num2) {
 //        validArgs(num1, num2);
 //        String result = "";
@@ -1624,10 +2170,10 @@ public class leetcode {
             System.out.println(Arrays.toString(smallestRange(array)));//[1,1]
      */
 
-    /**
-     * @param nums
-     * @return
-     */
+/**
+ * @param nums
+ * @return
+ */
 //    static int[] smallestRange(List<List<Integer>> nums) {
 //        Map<Integer, Set<Integer>> mapper = new HashMap<>();
 //        Set<Integer> ns = new TreeSet<>();//所有元素的集合
@@ -1718,12 +2264,12 @@ public class leetcode {
         System.out.println(isValid("{[)]}("));//false
      */
 
-    /**
-     * 判断是否是有效的括号
-     *
-     * @param str 需要被判断的字符串
-     * @return 返回是否是有效的
-     */
+/**
+ * 判断是否是有效的括号
+ *
+ * @param str 需要被判断的字符串
+ * @return 返回是否是有效的
+ */
 //    static boolean isValid(String str) {
 //        Map<Character, Character> key = new HashMap<>();
 //        key.put('{', '}');
@@ -1763,12 +2309,12 @@ public class leetcode {
         System.out.println(findMagicIndex(new int[]{1, 2, 3, 4, 4}));//4
      */
 
-    /**
-     * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
-     *
-     * @param nums 需要查找的数组
-     * @return 返回 magic index
-     */
+/**
+ * 传入一个数组，找到最小的 magic index 符合 nums[i]=i
+ *
+ * @param nums 需要查找的数组
+ * @return 返回 magic index
+ */
 //    static int findMagicIndex(int[] nums) {
 //        if (nums.length < 1 || nums.length > 1000000) {
 //            throw new IllegalArgumentException();
@@ -2049,8 +2595,8 @@ public class leetcode {
 //        return -1;
 //    }
 
-    //abczybdefca
-    //aaaa
+//abczybdefca
+//aaaa
 //    static String getLongestResult(char[] charSs, int startIndex, int endIndex, Map<
 //            Character, List<Integer>> infoMap) {
 ////        if(startIndex==endIndex){
@@ -2568,17 +3114,17 @@ public class leetcode {
 //        result.addAll(l2);
 //        return result;
 //    }
-    // static List<Integer> getResult(TreeNode subRoot){
-    // ArrayList<Integer> result = new ArrayList<>();
-    // if(subRoot.left!=null){
-    // result = mergeList(result,getResult(subRoot.left));
-    // }
-    // result = mergeList(result, (new ArrayList<>(subRoot.val)));
-    // if(subRoot.right == null){
-    // result = mergeList(result,getResult(subRoot.right));
-    // }
-    // return result;
-    // }
+// static List<Integer> getResult(TreeNode subRoot){
+// ArrayList<Integer> result = new ArrayList<>();
+// if(subRoot.left!=null){
+// result = mergeList(result,getResult(subRoot.left));
+// }
+// result = mergeList(result, (new ArrayList<>(subRoot.val)));
+// if(subRoot.right == null){
+// result = mergeList(result,getResult(subRoot.right));
+// }
+// return result;
+// }
 
 //    static List<Integer> inorderTraversal(TreeNode root) {
 //        List<Integer> result = new ArrayList<>();
@@ -2660,16 +3206,14 @@ public class leetcode {
 //        return result;
 //    }
 
-    // static int getSideIndex(int[] nums) {
-    // int zeroCount = 0;
-    // for (int i = 0; i < nums.length; i++) {
-    // if (0 == nums[i]) {
-    // zeroCount++;
-    // } else if (0 < nums[i]) {
-    // return i;
-    // }
-    // }
-    // return -1;
-    // }
-
-}
+// static int getSideIndex(int[] nums) {
+// int zeroCount = 0;
+// for (int i = 0; i < nums.length; i++) {
+// if (0 == nums[i]) {
+// zeroCount++;
+// } else if (0 < nums[i]) {
+// return i;
+// }
+// }
+// return -1;
+// }
